@@ -7,7 +7,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.TextView;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -15,8 +14,6 @@ import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
 
 public class WeatherService extends Service {
-    public String date;
-    public String temp;
     final String LOG_TAG = "myLogs";
     model5Days model=new model5Days();
     public void onCreate() {
@@ -24,8 +21,6 @@ public class WeatherService extends Service {
         Log.d(LOG_TAG, "onCreate");
     }
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(LOG_TAG, "onStartCommand");
-        DB myDBHelper = new DB(getApplicationContext());
         DownloadWeather();
 
         return START_REDELIVER_INTENT;
@@ -56,23 +51,27 @@ public class WeatherService extends Service {
                         if(response.body()!=null&&response.isSuccessful()) {
                             model=response.body();
                             WeatherDescriptionModel[] weatherDescription= model.list;
+                            intent.putExtra("tempNow",
+                                    String.valueOf(weatherDescription[0].main.getTemp()));
+                            intent.putExtra("pressureNow",
+                                    String.valueOf(weatherDescription[0].main.getPressure()));
+                            intent.putExtra("humidityNow",
+                                    String.valueOf(weatherDescription[0].main.getHumidity()));
+                            intent.putExtra("windNow",
+                                    String.valueOf(weatherDescription[0].wind.getSpeed()));
+                            intent.putExtra("weatherDescrip",
+                                    String.valueOf(weatherDescription[0].weather[0].getDescription()));
                             for (int i = 0; i <weatherDescription.length ; i++) {
                                 intent.putExtra("ok",
                                         0);
-                                intent.putExtra("tempNow",
-                                        String.valueOf(weatherDescription[0].main.getTemp()));
-                                intent.putExtra("pressureNow",
-                                        String.valueOf(weatherDescription[0].main.getPressure()));
-                                intent.putExtra("humidityNow",
-                                        String.valueOf(weatherDescription[0].main.getHumidity()));
-                                intent.putExtra("windNow",
-                                        String.valueOf(weatherDescription[0].wind.getSpeed()));
-                                intent.putExtra("weatherDescrip",
-                                        String.valueOf(weatherDescription[0].weather[0].getDescription()));
                                   intent.putExtra("date",
                                         String.valueOf(weatherDescription[i].dt));
                                 intent.putExtra("temp",
                                         String.valueOf(weatherDescription[i].main.getTemp()));
+                                intent.putExtra("desriptionItem",
+                                        String.valueOf(weatherDescription[i].weather[0].getDescription()));
+                                intent.putExtra("wind",
+                                        String.valueOf(weatherDescription[i].wind.getSpeed()));
                                 sendBroadcast(intent);
                             }
                         }

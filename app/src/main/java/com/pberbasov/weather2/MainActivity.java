@@ -2,6 +2,7 @@ package com.pberbasov.weather2;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -16,21 +17,21 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
+import android.widget.SimpleCursorTreeAdapter;
 import android.widget.TextView;
 
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
-    SimpleCursorAdapter scAdapter;
-    ListView lvData;
+public class MainActivity extends AppCompatActivity {
+    SimpleCursorTreeAdapter scAdapter;
+    ExpandableListView lvData;
     DB db;
 
     public final static String BROADCAST_ACTION = "com.pberbasov.weather2";
 
     // формируем столбцы сопоставления
-    String[] from = new String[] { DB.COLUMN_DATE_WEATHER, DB.COLUMN_TIME_WEATHER, DB.COLUMN_TEMP };
-    int[] to = new int[] { R.id.weatherDate,R.id.weatherTime, R.id.weatherTemp };
 
     BroadcastReceiver br;
 
@@ -51,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         startService(new Intent(this, WeatherService.class));
         setContentView(R.layout.activity_main);
         db = new DB(this);
@@ -64,16 +64,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 if(ok==0) {
                     String temp = ceil(intent.getStringExtra("temp"));
                     String date = intent.getStringExtra("date");
-                    Log.d("LOG", date + "-" + temp);
-                    int s=db.uppRec(date, temp);
-                    if (s<1) db.addRec(date,temp);
+                    String wind = intent.getStringExtra("wind");
+                    String description = intent.getStringExtra("desriptionItem");
+                    int s=db.uppRec(date, temp, wind,description);
+                    if (s<1) db.addRec(date,temp,wind,description);
                     tempNowStr=ceil(intent.getStringExtra("tempNow"));
                     pressureNowStr=intent.getStringExtra("pressureNow");
                     humidityNowStr=intent.getStringExtra("humidityNow");
                     windNowStr=intent.getStringExtra("windNow");
                     descripNowStr=intent.getStringExtra("weatherDescrip");
                 }
-                Objects.requireNonNull(LoaderManager.getInstance(MainActivity.this).getLoader(0)).forceLoad();
                 tempNow=findViewById(R.id.temp);
                 tempNow.setText(tempNowStr);
 
@@ -111,46 +111,37 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         db.close();
     }
 
-private void getAdapter(){
-    // создаем адаптер и настраиваем список
-    scAdapter = new SimpleCursorAdapter(this, R.layout.item, null, from, to, 0);
+private void getAdapter() {
+    String[] group = new String[] { "19.06", "20.06", "21.06", "22.06","23.06","24.06"};
+    db.addRec2(group);
+    Cursor cursor =db.getDateData();
+    startManagingCursor(cursor);
+    String[] groupFrom={ DB.COLUMN_DATE };
+    int[] groupTo = { android.R.id.text1 };
+    // сопоставление данных и View для элементов
+    String[] childFrom = { DB.COLUMN_TEMP, DB.COLUMN_TIME_WEATHER, DB.COLUMN_WIND, DB.COLUMN_DESC };
+    int[] childTo = { R.id.temp_item, R.id.time , R.id.wind_item, R.id.desc_item};
+
+    SimpleCursorTreeAdapter sctAdapter = new MyAdapter(this, cursor,
+            android.R.layout.simple_expandable_list_item_1, groupFrom,
+            groupTo, R.layout.my_list_item, childFrom,
+            childTo);
     lvData = findViewById(R.id.wethertData);
-    lvData.setAdapter(scAdapter);
-    lvData.setSelection(2);
-
-    registerForContextMenu(lvData);
-
-    // создаем лоадер для чтения данных
-    LoaderManager.getInstance(MainActivity.this).initLoader(0,null, this);
-}
-    @NonNull
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
-        return new MyCursorLoader(this, db);
+    lvData.setAdapter(sctAdapter);
     }
+    class MyAdapter extends SimpleCursorTreeAdapter {
 
-    @Override
-    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        scAdapter.swapCursor(cursor);
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        scAdapter.swapCursor(null);
-    }
-    static class MyCursorLoader extends CursorLoader {
-
-        DB db;
-
-        public MyCursorLoader(Context context, DB db) {
-            super(context);
-            this.db = db;
+        public MyAdapter(Context context, Cursor cursor, int groupLayout,
+                         String[] groupFrom, int[] groupTo, int childLayout,
+                         String[] childFrom, int[] childTo) {
+            super(context, cursor, groupLayout, groupFrom, groupTo,
+                    childLayout, childFrom, childTo);
         }
 
-        @Override
-        public Cursor loadInBackground() {
-            return db.getAllData();
+        protected Cursor getChildrenCursor(Cursor groupCursor) {
+            // получаем курсор по элементам для конкретной группы
+            int idColumn = groupCursor.getColumnIndex(DB.COLUMN_DATE);
+            return db.getAllData(groupCursor.getString(idColumn));
         }
-
     }
 }

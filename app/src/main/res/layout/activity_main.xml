@@ -83,10 +83,18 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-    <ListView
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:text="Погода на 5 дней:"
+        android:textSize="16sp"/>
+    <ExpandableListView
         android:id="@+id/wethertData"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp">
-    </ListView>
+        android:layout_margin="8dp"
+         >
+    </ExpandableListView>
 </LinearLayout>
