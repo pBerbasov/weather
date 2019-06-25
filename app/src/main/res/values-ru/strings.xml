@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Weather in city</string>
+    <string name="weather_city">Weather in the</string>
+    <string name="pressure">Pressure:</string>
+    <string name="humidity">Humidity:</string>
+    <string name="wind">Wind:</string>
+    <string name="weather_on_5_days">Weather on 5 days:</string>
+    <string name="serach">search</string>
+    <string name="Refine">Refine location GPS</string>
+    <string name="gps">GPS</string>
+</resources>
