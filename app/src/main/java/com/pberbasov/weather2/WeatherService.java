@@ -8,7 +8,6 @@ import com.pberbasov.weather2.jsonWeather.model.weatherCity;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 
 import retrofit2.Call;
 import retrofit2.Callback;

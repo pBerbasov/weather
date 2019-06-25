@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 
@@ -18,11 +19,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -78,10 +77,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState);
         mSettings = getSharedPreferences(LATITUDE, Context.MODE_PRIVATE);
         mSettings = getSharedPreferences(LONGITUDE, Context.MODE_PRIVATE);
-        Log.i("LOG", mSettings.getString(LATITUDE, ""));
         latitude = mSettings.getString(LATITUDE, "51.5085300");
         longitude = mSettings.getString(LONGITUDE, "-0.1257400");
 
@@ -128,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     descripNowStr = intent.getStringExtra("weatherDescrip");
                     latitude = intent.getStringExtra("lat");
                     longitude = intent.getStringExtra("lon");
-                    Log.i("LOG", latitude + " : " + longitude);
                     //сохраняем GPS
                     applyGPS(latitude, longitude);
 
