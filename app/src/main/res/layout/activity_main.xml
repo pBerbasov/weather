@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#636FC6F7">
+    android:background="#636FC6F7"
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/walpeper"
@@ -14,14 +14,31 @@
         android:background="@drawable/cirkul"
         android:orientation="vertical">
 
+        <ProgressBar
+            android:id="@+id/progres"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:indeterminate="true"
+            />
+
         <TextView
+            android:id="@+id/weatherCity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:text="@string/weather"
+            android:text="@string/weather_city"
             android:textColor="#fff"
             android:textSize="15sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/weatherGPS"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Refine"
+            android:textColor="#fff"
+            android:paddingLeft="16dp"
+            android:textSize="8sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/temp"
@@ -52,7 +69,8 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                tools:ignore="UselessParent">
 
                 <TextView
                     android:id="@+id/wind"
@@ -83,18 +101,18 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
         android:paddingTop="16dp"
-        android:text="Погода на 5 дней:"
-        android:textSize="16sp"/>
+        android:text="@string/weather_on_5_days"
+        android:textSize="16sp" />
+
     <ExpandableListView
         android:id="@+id/wethertData"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-         >
-    </ExpandableListView>
+        android:layout_margin="8dp" />
 </LinearLayout>

@@ -9,7 +9,7 @@ public class mainWeatherModel {
     @SerializedName("humidity")
     @Expose private String humidity;
 
-    public Double getTemp(){
+    public Double getTemp() {
         return temp;
     }
     public String getPressure(){
