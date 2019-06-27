@@ -3,32 +3,32 @@ package com.pberbasov.weather2.jsonWeather;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class addWeather {
-    private static addWeather singleton = null;
-    private interface5days API;
+public class AddWeather {
+    private static AddWeather singleton = null;
+    private Interface5days API;
 
-    private addWeather() {
+    private AddWeather() {
         API = createAdapter();
     }
 
-    public static addWeather getSingleton() {
+    public static AddWeather getSingleton() {
         if (singleton == null) {
-            singleton = new addWeather();
+            singleton = new AddWeather();
         }
 
         return singleton;
     }
 
-    public interface5days getAPI() {
+    public Interface5days getAPI() {
         return API;
     }
 
-    private interface5days createAdapter() {
+    private Interface5days createAdapter() {
         Retrofit adapter = new Retrofit.Builder()
                 .baseUrl("https://api.openweathermap.org/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        return adapter.create(interface5days.class);
+        return adapter.create(Interface5days.class);
     }
 }
