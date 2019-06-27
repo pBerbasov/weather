@@ -1,9 +1,9 @@
 package com.pberbasov.weather2;
 
-import com.pberbasov.weather2.jsonWeather.addWeather;
+import com.pberbasov.weather2.jsonWeather.AddWeather;
 import com.pberbasov.weather2.jsonWeather.model.WeatherDescriptionModel;
-import com.pberbasov.weather2.jsonWeather.model.model5Days;
-import com.pberbasov.weather2.jsonWeather.model.weatherCity;
+import com.pberbasov.weather2.jsonWeather.model.Model5Days;
+import com.pberbasov.weather2.jsonWeather.model.WeatherCity;
 
 import android.app.Service;
 import android.content.Intent;
@@ -15,7 +15,7 @@ import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
 
 public class WeatherService extends Service {
-    model5Days model = new model5Days();
+    Model5Days model = new Model5Days();
 
     String latitude;
     String longitude;
@@ -46,22 +46,22 @@ public class WeatherService extends Service {
     void DownloadWeather() {
         new Thread(new Runnable() {
             public void run() {
-                addWeather.getSingleton().getAPI().loadWeather(
+                AddWeather.getSingleton().getAPI().loadWeather(
                         city,
                         latitude,
                         longitude,
                         "metric",
                         getString(R.string.local),
-                        "a4562acf414871a49438dc43193635ee").enqueue(new Callback<model5Days>() {
+                        "a4562acf414871a49438dc43193635ee").enqueue(new Callback<Model5Days>() {
                     @Override
                     @EverythingIsNonNull
-                    public void onResponse(Call<model5Days> call, Response<model5Days> response) {
+                    public void onResponse(Call<Model5Days> call, Response<Model5Days> response) {
                         Intent intent = new Intent(MainActivity.BROADCAST_ACTION);
                         if (response.body() != null && response.isSuccessful()) {
                             model = response.body();
                             //получаем данные retofit из Json и отправляем их в Активити
                             WeatherDescriptionModel[] weatherDescription = model.list;
-                            weatherCity city = model.city;
+                            WeatherCity city = model.city;
                             intent.putExtra("cityNow",
                                     String.valueOf(city.getCityName()));
                             intent.putExtra("lat",
@@ -96,7 +96,7 @@ public class WeatherService extends Service {
                     }
 
                     @Override
-                    public void onFailure(Call<model5Days> call, Throwable t) {
+                    public void onFailure(Call<Model5Days> call, Throwable t) {
 
                         Intent intent = new Intent(MainActivity.BROADCAST_ACTION);
                         //отправляем 1 для сообщения об ошибке

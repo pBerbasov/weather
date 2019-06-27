@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         db.open();
         getAdapter();
         GPS=new Location(this,progress,mSettings);
+        progress=GPS.progress;
         getBrodcast();
         refline.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -156,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 .putExtra("longitude", "")
                 .putExtra("city", query)
         );
-        progress.setVisibility(View.VISIBLE);
         return false;
     }
 

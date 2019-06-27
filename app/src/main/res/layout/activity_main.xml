@@ -36,8 +36,8 @@
             android:layout_height="wrap_content"
             android:text="@string/Refine"
             android:textColor="#fff"
-            android:paddingLeft="16dp"
-            android:textSize="8sp"
+            android:paddingStart="16dp"
+            android:textSize="12sp"
             android:textStyle="bold" />
 
         <TextView

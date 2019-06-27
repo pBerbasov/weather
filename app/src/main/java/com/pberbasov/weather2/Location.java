@@ -21,20 +21,18 @@ import static com.pberbasov.weather2.MainActivity.LONGITUDE;
 
 public class Location {
     private static final int PERMISSION_REQUEST_CODE = 10;
-    private LocationManager locationManager;
-    private String provider;
     ProgressBar progress;
-    Activity mainActivity;
+    private Activity mainActivity;
     private SharedPreferences mSettings;
-    public Location(Activity mainActivity, ProgressBar progress, SharedPreferences mSettings){
-this.mainActivity=mainActivity;
-this.progress=progress;
-this.mSettings=mSettings;
+
+    Location(Activity mainActivity, ProgressBar progress, SharedPreferences mSettings) {
+        this.mainActivity = mainActivity;
+        this.progress = progress;
+        this.mSettings = mSettings;
 
     }
 
-    public void onGPS() {
-        progress.setVisibility(View.VISIBLE);
+    void onGPS() {
         // Проверим на пермиссии, и если их нет, запросим у пользователя
         if (ActivityCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -45,12 +43,13 @@ this.mSettings=mSettings;
             requestLocationPermissions();
         }     // Обработка нажатия
     }
+
     private void requestLocation() {
         // Если пермиссии все-таки нет - просто выйдем, приложение не имеет смысла
         if (ActivityCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             return;
-        locationManager = (LocationManager) mainActivity.getSystemService(LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) mainActivity.getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_COARSE);
 
@@ -58,7 +57,7 @@ this.mSettings=mSettings;
         // Но можно и самому назначать, какой провайдер использовать
         // В основном это LocationManager.GPS_PROVIDER или LocationManager.NETWORK_PROVIDER
         // Но может быть и LocationManager.PASSIVE_PROVIDER (когда координаты уже кто-то недавно получил)
-        provider = locationManager.getBestProvider(criteria, true);
+        String provider = locationManager.getBestProvider(criteria, true);
         if (provider != null) {
             // Будем получать геоположение через каждые час или каждые 10 километров
             locationManager.requestLocationUpdates(provider, 3600000, 10000, new LocationListener() {
@@ -94,12 +93,14 @@ this.mSettings=mSettings;
             });
         }
     }
-    public void applyGPS(String latitude, String longitude) {
+
+    void applyGPS(String latitude, String longitude) {
         SharedPreferences.Editor editor = mSettings.edit();
         editor.putString(LATITUDE, latitude);
         editor.putString(LONGITUDE, longitude);
         editor.apply();
     }
+
     private void requestLocationPermissions() {
         if (!ActivityCompat.shouldShowRequestPermissionRationale(mainActivity, Manifest.permission.CALL_PHONE)) {
             // Запросим эти две пермиссии у пользователя

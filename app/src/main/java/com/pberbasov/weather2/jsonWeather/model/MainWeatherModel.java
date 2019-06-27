@@ -1,7 +1,7 @@
 package com.pberbasov.weather2.jsonWeather.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-public class mainWeatherModel {
+public class MainWeatherModel {
     @SerializedName("temp")
     @Expose private Double temp;
     @SerializedName("pressure")

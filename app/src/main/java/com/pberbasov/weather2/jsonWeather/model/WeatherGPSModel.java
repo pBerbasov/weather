@@ -3,7 +3,7 @@ package com.pberbasov.weather2.jsonWeather.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class weatherGPSModel {
+public class WeatherGPSModel {
 
     @SerializedName("lat")
     @Expose

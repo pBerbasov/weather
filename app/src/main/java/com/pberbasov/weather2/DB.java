@@ -9,20 +9,20 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class DB {
+class DB {
 
     private static final String DB_NAME = "weather";
     private static final int DB_VERSION = 1;
     private static final String DB_TABLE_WEATHER = "weatherOf5Day";
     private static final String DB_TABLE_DAY = "weatherDate";
 
-    public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_DATE = "date";
-    public static final String COLUMN_DATE_WEATHER = "dateWeather";
-    public static final String COLUMN_TIME_WEATHER = "timeWeather";
-    public static final String COLUMN_TEMP = "tempe";
-    public static final String COLUMN_WIND = "wind";
-    public static final String COLUMN_DESC = "descr";
+    private static final String COLUMN_ID = "_id";
+    static final String COLUMN_DATE = "date";
+    private static final String COLUMN_DATE_WEATHER = "dateWeather";
+    static final String COLUMN_TIME_WEATHER = "timeWeather";
+    static final String COLUMN_TEMP = "tempe";
+    static final String COLUMN_WIND = "wind";
+    static final String COLUMN_DESC = "descr";
 
     private static final String DB_CREATE_POGODA =
             "create table " + DB_TABLE_WEATHER + "(" +
@@ -43,23 +43,23 @@ public class DB {
     private DBHelper mDBHelper;
     private SQLiteDatabase mDB;
 
-    public DB(Context ctx) {
+    DB(Context ctx) {
         mCtx = ctx;
     }
 
     // открыть подключение
-    public void open() {
+    void open() {
         mDBHelper = new DBHelper(mCtx, DB_NAME, null, DB_VERSION);
         mDB = mDBHelper.getWritableDatabase();
     }
 
     // закрыть подключение
-    public void close() {
+    void close() {
         if (mDBHelper != null) mDBHelper.close();
     }
 
     // получить все данные из таблицы DB_WEATHER
-    public Cursor getAllData(String date) {
+    Cursor getAllData(String date) {
         String query = "SELECT *, strftime('%d.%m',DATE,'unixepoch','localtime')" +
                 " AS " + COLUMN_DATE_WEATHER + ", strftime('%H:%M',DATE,'unixepoch','localtime') " +
                 "AS " + COLUMN_TIME_WEATHER + " " +
@@ -69,13 +69,13 @@ public class DB {
     }
 
     //получаем близжайшие 6 дат
-    public Cursor getDateData() {
+    Cursor getDateData() {
         String query = "SELECT * FROM " + DB_TABLE_DAY;
         return mDB.rawQuery(query, null);
     }
 
     //обновляем таблицу с погодой
-    public int uppRec(String date, String temp, String wind, String desc) {
+    int uppRec(String date, String temp, String wind, String desc) {
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_TEMP, temp);
         cv.put(COLUMN_WIND, wind);
@@ -85,7 +85,7 @@ public class DB {
     }
 
     //обновляем таблицу с датами
-    public int dataRec(String id, String date) {
+    int dataRec(String id, String date) {
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_DATE, date);
         return mDB.update(DB_TABLE_DAY, cv, COLUMN_ID + "= ?",
@@ -93,7 +93,7 @@ public class DB {
     }
 
     //добавляем записи о погоде
-    public void addRec(String date, String temp, String wind, String desc) {
+    void addRec(String date, String temp, String wind, String desc) {
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_DATE, date);
         cv.put(COLUMN_TEMP, temp);
@@ -103,10 +103,10 @@ public class DB {
     }
 
     //добавляем записи о датах
-    public void addRec2(String... date) {
+    void addRec2(String... date) {
         ContentValues cv2 = new ContentValues();
-        for (int i = 0; i < date.length; i++) {
-            cv2.put(COLUMN_DATE, date[i]);
+        for (String s : date) {
+            cv2.put(COLUMN_DATE, s);
             mDB.insert(DB_TABLE_DAY, null, cv2);
         }
     }
@@ -114,8 +114,8 @@ public class DB {
     // класс по созданию и управлению БД
     private class DBHelper extends SQLiteOpenHelper {
 
-        public DBHelper(Context context, String name, CursorFactory factory,
-                        int version) {
+        DBHelper(Context context, String name, CursorFactory factory,
+                 int version) {
             super(context, name, factory, version);
         }
 

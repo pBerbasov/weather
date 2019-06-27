@@ -6,9 +6,9 @@ public class WeatherDescriptionModel {
     @SerializedName("dt")
     public int dt;
     @SerializedName("main")
-    public mainWeatherModel main;
+    public MainWeatherModel main;
     @SerializedName("wind")
-    public weatherWindModel wind;
+    public WeatherWindModel wind;
     @SerializedName("weather")
-    public weatherWeatherModel[] weather;
+    public WeatherWeatherModel[] weather;
 }
