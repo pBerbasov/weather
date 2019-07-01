@@ -1,0 +1,12 @@
+<resources>
+    <string name="local">ru</string>
+    <string name="app_name">Погода в городе</string>
+    <string name="weather_city">Погода в городе</string>
+    <string name="pressure">Давление:</string>
+    <string name="humidity">Влажность:</string>
+    <string name="wind">Ветер:</string>
+    <string name="weather_on_5_days">Погода на 5 дней:</string>
+    <string name="serach">поиск города</string>
+    <string name="Refine">уточнить местоположение по GPS</string>
+    <string name="gps">GPS</string>
+</resources>
