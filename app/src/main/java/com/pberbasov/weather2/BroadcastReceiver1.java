@@ -1,7 +1,6 @@
 package com.pberbasov.weather2;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,36 +11,34 @@ import android.widget.TextView;
 
 public class BroadcastReceiver1 extends BroadcastReceiver {
     private String tempNowStr;
-
     private String pressureNowStr;
-
     private String humidityNowStr;
-
     private String windNowStr;
-
     private String descripNowStr;
-
     private String weatherCityStr;
     ProgressBar progress;
-    Activity main;
+    MainActivity main;
     String latitude;
     String longitude;
     DB db;
     Cursor cursor;
     Location GPS;
-    public BroadcastReceiver1(Activity MainActviti,Cursor cursor,String latitude,String longitude,DB db,ProgressBar progress,Location GPS) {
-        main=MainActviti;
-        this.cursor=cursor;
-        this.db=db;
-        this.latitude=latitude;
-        this.longitude=longitude;
-        this.progress=progress;
-        this.GPS=GPS;
+
+    public BroadcastReceiver1(MainActivity MainActviti, Cursor cursor, String latitude, String longitude, DB db, ProgressBar progress, Location GPS) {
+        main = MainActviti;
+        this.cursor = cursor;
+        this.db = db;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.progress = progress;
+        this.GPS = GPS;
     }
+
     @SuppressLint("SetTextI18n")
     public void onReceive(Context context, Intent intent) {
         //Получаем данные из сервиса, если ок, загрузка прошла успешно.
         int ok = intent.getIntExtra("ok", 1);
+        // main.lvData.setVisibility(View.GONE);
         if (ok == 0) {
             //убираем прогресс бар
             progress = main.findViewById(R.id.progres);
@@ -66,14 +63,32 @@ public class BroadcastReceiver1 extends BroadcastReceiver {
             //Добавляем или обновляем записи в базе данных
             int updateWeather = db.uppRec(date, temp, wind, description);
             if (updateWeather < 1) db.addRec(date, temp, wind, description);
+
+            for (int i = 0; i < 7; i++) {
+                main.lvData.collapseGroup(i);
+            }
+
         } else
             //Повторно запускаем сервис если произошла ошибка загрузки данных
             main.startService(new Intent(main, WeatherService.class)
                     .putExtra("latitude", latitude)
                     .putExtra("longitude", longitude));
-        cursor.requery();
 
         //Обновляем данные в верхнем центральном окне
+        updateCardTop();
+    }
+
+    private String ceil(String text) {
+        //Округляем температуру
+        String tempPlus;
+        if ((int) Math.ceil(Double.parseDouble(text)) > 0) {
+            tempPlus = "+" + (int) Math.ceil(Double.parseDouble(text)) + "C";
+        } else tempPlus = "-" + (int) Math.ceil(Double.parseDouble(text)) + "C";
+        return tempPlus;
+    }
+
+    @SuppressLint("SetTextI18n")
+    void updateCardTop() {
         TextView weatherCity = main.findViewById(R.id.weatherCity);
         weatherCity.setText(main.getString(R.string.weather_city) + " " + weatherCityStr);
 
@@ -91,13 +106,5 @@ public class BroadcastReceiver1 extends BroadcastReceiver {
 
         TextView descripNow = main.findViewById(R.id.description);
         descripNow.setText(descripNowStr);
-    }
-    private String ceil(String text) {
-        //Округляем температуру
-        String tempPlus;
-        if ((int) Math.ceil(Double.parseDouble(text)) > 0) {
-            tempPlus = "+" + (int) Math.ceil(Double.parseDouble(text)) + "C";
-        } else tempPlus = "-" + (int) Math.ceil(Double.parseDouble(text)) + "C";
-        return tempPlus;
     }
 }

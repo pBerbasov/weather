@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#636FC6F7"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <LinearLayout
         android:id="@+id/walpeper"
@@ -97,7 +98,8 @@
                     android:paddingStart="16dp"
                     android:text="@string/humidity"
                     android:textColor="#fff"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    tools:ignore="RtlSymmetry" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -109,10 +111,10 @@
         android:paddingTop="16dp"
         android:text="@string/weather_on_5_days"
         android:textSize="16sp" />
-
     <ExpandableListView
         android:id="@+id/wethertData"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp" />
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:choiceMode = "singleChoice"/>
 </LinearLayout>

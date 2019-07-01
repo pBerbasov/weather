@@ -64,7 +64,7 @@ class DB {
                 " AS " + COLUMN_DATE_WEATHER + ", strftime('%H:%M',DATE,'unixepoch','localtime') " +
                 "AS " + COLUMN_TIME_WEATHER + " " +
                 "FROM " + DB_TABLE_WEATHER + " " +
-                "WHERE " + COLUMN_DATE + ">strftime('%s','now') AND " + COLUMN_DATE_WEATHER + "='" + date + "'";
+                "WHERE " + COLUMN_DATE + ">strftime('%s','now','-3 hours') AND " + COLUMN_DATE_WEATHER + "='" + date + "'";
         return mDB.rawQuery(query, null);
     }
 

@@ -8,44 +8,49 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
-import android.widget.SimpleCursorTreeAdapter;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
     ExpandableListView lvData;
     DB db;
     Cursor cursor;
-    SimpleCursorTreeAdapter sctAdapter;
+    MySimpleCursorTreeAdapter sctAdapter;
     public final static String BROADCAST_ACTION = "com.pberbasov.weather2";
-
-    // формируем столбцы сопоставления
 
     BroadcastReceiver1 br;
 
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
-    private SharedPreferences mSettings;
 
     String latitude;
     String longitude;
     ProgressBar progress;
     Location GPS;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         super.onCreate(savedInstanceState);
-        mSettings = getSharedPreferences(LATITUDE, Context.MODE_PRIVATE);
+
+        SharedPreferences mSettings;
         mSettings = getSharedPreferences(LONGITUDE, Context.MODE_PRIVATE);
         latitude = mSettings.getString(LATITUDE, "51.5085300");
         longitude = mSettings.getString(LONGITUDE, "-0.1257400");
@@ -55,12 +60,14 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 .putExtra("latitude", latitude)
                 .putExtra("longitude", longitude));
         setContentView(R.layout.activity_main);
+
         TextView refline = findViewById(R.id.weatherGPS);
         db = new DB(this);
         db.open();
+
         getAdapter();
-        GPS=new Location(this,progress,mSettings);
-        progress=GPS.progress;
+        GPS = new Location(this, progress, mSettings);
+        progress = GPS.progress;
         getBrodcast();
         refline.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -69,8 +76,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         });
     }
 
-        private void getBrodcast() {
-        br = new BroadcastReceiver1(this,cursor,latitude,longitude,db,progress,GPS);
+    private void getBrodcast() {
+        br = new BroadcastReceiver1(this, cursor, latitude, longitude, db, progress, GPS);
         IntentFilter intFilt = new IntentFilter(BROADCAST_ACTION);
         // регистрируем (включаем) BroadcastReceiver
         registerReceiver(br, intFilt);
@@ -82,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         // дерегистрируем (выключаем) BroadcastReceiver
         unregisterReceiver(br);
         db.close();
-        cursor.close();
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -93,39 +99,60 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             group[i] = new SimpleDateFormat("dd.MM").format(new Date().getTime() + i * 86400000);
             int s = db.dataRec(String.valueOf(i + 1), group[i]);
             if (s < 1) db.addRec2(group);
-            ;
         }
         cursor = db.getDateData();
-        startManagingCursor(cursor);
         String[] groupFrom = {DB.COLUMN_DATE};
         int[] groupTo = {android.R.id.text1};
         // сопоставление данных и View для элементов
         String[] childFrom = {DB.COLUMN_TEMP, DB.COLUMN_TIME_WEATHER, DB.COLUMN_WIND, DB.COLUMN_DESC};
         int[] childTo = {R.id.temp_item, R.id.time, R.id.wind_item, R.id.desc_item};
-
-        sctAdapter = new MyAdapter(this, cursor,
+        lvData = findViewById(R.id.wethertData);
+        sctAdapter = new MySimpleCursorTreeAdapter(this, cursor,
                 android.R.layout.simple_expandable_list_item_1, groupFrom,
                 groupTo, R.layout.my_list_item, childFrom,
-                childTo);
-        lvData = findViewById(R.id.wethertData);
+                childTo, db);
         lvData.setAdapter(sctAdapter);
-    }
-
-    class MyAdapter extends SimpleCursorTreeAdapter {
-
-        public MyAdapter(Context context, Cursor cursor, int groupLayout,
-                         String[] groupFrom, int[] groupTo, int childLayout,
-                         String[] childFrom, int[] childTo) {
-            super(context, cursor, groupLayout, groupFrom, groupTo,
-                    childLayout, childFrom, childTo);
-        }
-
-        protected Cursor getChildrenCursor(Cursor groupCursor) {
-            // получаем курсор по элементам для конкретной группы
-            int idColumn = groupCursor.getColumnIndex(DB.COLUMN_DATE);
-            return db.getAllData(groupCursor.getString(idColumn));
+        Loader<Cursor> loader = LoaderManager.getInstance(this).getLoader(-1);
+        if (loader != null && !loader.isReset()) {
+            LoaderManager.getInstance(this).restartLoader(-1, null, this);
+        } else {
+            LoaderManager.getInstance(this).initLoader(-1, null, this);
         }
     }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle bndl) {
+        Log.d("LOG", "onCreateLoader for loader_id " + id);
+        CursorLoader cl;
+        cl = new MyCursorLoader(this, db);
+        return cl;
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        Log.i("LOG", "bax");
+    }
+
+    static class MyCursorLoader extends CursorLoader {
+
+        DB db;
+
+        MyCursorLoader(Context context, DB db) {
+            super(context);
+            this.db = db;
+        }
+
+        @Override
+        public Cursor loadInBackground() {
+            return db.getDateData();
+        }
+    }
+
     //Создаем меню поиск
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
